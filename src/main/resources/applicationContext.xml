@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+   http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context-3.0.xsd
+   http://www.springframework.org/schema/tx
+   http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+   http://www.springframework.org/schema/aop
+   http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dataSource"
+          class="com.mchange.v2.c3p0.ComboPooledDataSource" >
+        <property name="driverClass" value="${jdbc.driverClassName}" />
+        <property name="jdbcUrl" value="${jdbc.url}" />
+        <property name="user" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="maxPoolSize" value="100" />
+        <property name="minPoolSize" value="10" />
+        <property name="initialPoolSize" value="20" />
+        <property name="breakAfterAcquireFailure" value="false" />
+        <property name="testConnectionOnCheckout" value="false" />
+        <property name="acquireIncrement" value="5" />
+        <property name="idleConnectionTestPeriod" value="600" />
+        <property name="maxStatements" value="100" />
+        <property name="maxStatementsPerConnection" value="10" />
+        <property name="maxIdleTime" value="30" />
+        <property name="numHelperThreads" value="10" />
+        <property name="checkoutTimeout" value="60000"></property>
+        <property name="debugUnreturnedConnectionStackTraces" value="false"></property>
+    </bean>
+
+    <!-- 实体的映射文件的配置 -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- 自动扫描Hibernate注解类 -->
+        <property name="packagesToScan" value="com.study.test.module" />
+        <!-- hibernate配置 -->
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+                <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+                <prop key="connection.useUnicode">true</prop>
+                <prop key="connection.characterEncoding">utf-8</prop>
+
+                <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <prop key="jdbc.use_scrollable_resultset">false</prop>
+                <prop key="hibernate.autoReconnect">true</prop>
+
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.cache.use_query_cache">true</prop>
+                <prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- Spring注解配置 -->
+    <context:component-scan base-package="com.study.test">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+    <!-- AOP事务管理 -->
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="do*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="add*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="del*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="get*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="query*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="save*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="update*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="delete*" propagation="REQUIRED" rollback-for="Exception"/>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config expose-proxy="true">
+        <aop:pointcut id="managerMethod" expression="execution(* com.study.test.services..*Service..*.*(..))" />
+        <aop:advisor pointcut-ref="managerMethod" advice-ref="txAdvice" />
+    </aop:config>
+
+    <!--<bean id="action" class="com.study.test.services.test1Service.impl.Action"></bean>-->
+
+    <!--<bean id="country1" class="com.study.test.services.test2Service.impl.Australia">
+        <property name="capital" value="Canberra"/>
+        <property name="population" value="20264082"/>
+    </bean>
+    <bean id="country2" class="com.study.test.services.test2Service.impl.NewZealand">
+        <property name="capital" value="Wellington"/>
+        <property name="population" value="4076140"/>
+    </bean>-->
+
+
+</beans>

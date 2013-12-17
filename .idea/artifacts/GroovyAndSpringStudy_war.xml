@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="GroovyAndSpringStudy:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="com.study.GroovyAndSpringStudy-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="GroovyAndSpringStudy:war exploded" />
+    </root>
+  </artifact>
+</component>

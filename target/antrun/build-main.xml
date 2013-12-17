@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <mkdir dir="E:\WorkSpace\ideaWorkspace\GroovyAndSpringStudy\src\main\java\"/>
+  <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc">
+    <classpath refid="maven.compile.classpath"/>
+  </taskdef>
+  <mkdir dir="E:\WorkSpace\ideaWorkspace\GroovyAndSpringStudy\WebRoot\WEB-INF\classes"/>
+  <groovyc destdir="E:\WorkSpace\ideaWorkspace\GroovyAndSpringStudy\WebRoot\WEB-INF\classes" srcdir="E:\WorkSpace\ideaWorkspace\GroovyAndSpringStudy\src\main\java\">
+    <classpath refid="maven.compile.classpath"/>
+  </groovyc>
+</target>
+</project>
